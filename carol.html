@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Para Carol</title>
+    <!-- Fuente elegante y romántica -->
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
+    <style>
+        *,
+        *::after,
+        *::before {
+          padding: 0;
+          margin: 0;
+          box-sizing: border-box;
+        }
+
+        :root {
+          --dark-color: #000;
+          --fl-speed: 0.8s;
+          --speed-leaf: 2s;
+        }
+
+        body {
+          display: flex;
+          align-items: flex-end;
+          justify-content: center;
+          min-height: 100vh;
+          background-color: var(--dark-color);
+          overflow: hidden;
+          perspective: 1000px;
+          font-family: 'Arial', sans-serif;
+        }
+
+        .night {
+          position: fixed;
+          left: 50%;
+          top: 0;
+          transform: translateX(-50%);
+          width: 100%;
+          height: 100%;
+          filter: blur(0.1vmin);
+          background-image: radial-gradient(
+              ellipse at top,
+              transparent 0%,
+              var(--dark-color)
+            ),
+            radial-gradient(
+              ellipse at bottom,
+              var(--dark-color),
+              rgba(100, 180, 255, 0.2)
+            ),
+            repeating-linear-gradient(
+              220deg,
+              rgb(0, 0, 0) 0px,
+              rgb(0, 0, 0) 19px,
+              transparent 19px,
+              transparent 22px
+            ),
+            repeating-linear-gradient(
+              189deg,
+              rgb(0, 0, 0) 0px,
+              rgb(0, 0, 0) 19px,
+              transparent 19px,
+              transparent 22px
+            ),
+            repeating-linear-gradient(
+              148deg,
+              rgb(0, 0, 0) 0px,
+              rgb(0, 0, 0) 19px,
+              transparent 19px,
+              transparent 22px
+            ),
+            linear-gradient(90deg, rgb(0, 150, 255), rgb(200, 230, 255)); /* Azul profundo a celeste */
+        }
+
+        .shooting-stars {
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          pointer-events: none;
+          z-index: 1;
+        }
+
+        .shooting-star {
+          position: absolute;
+          width: 4px;
+          height: 4px;
+          background: #fff;
+          border-radius: 50%;
+          box-shadow: 0 0 6px 2px rgba(255, 255, 255, 0.8);
+          opacity: 0;
+          animation: shootingStar 3s linear infinite;
+        }
+
+        .shooting-star::before {
+          content: '';
+          position: absolute;
+          top: 50%;
+          right: 0;
+          transform: translateY(-50%);
+          width: 0;
+          height: 2px;
+          background: linear-gradient(90deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 1) 100%);
+          animation: shootingStarTail 3s linear infinite;
+        }
+
+        /* Estrellas predefinidas para carga inicial */
+        .shooting-star:nth-child(1) { top: 5%; left: -10%; animation-delay: 0s; animation-duration: 2.5s; }
+        .shooting-star:nth-child(2) { top: 15%; left: -10%; animation-delay: 0.5s; animation-duration: 3s; }
+        .shooting-star:nth-child(3) { top: 25%; left: -10%; animation-delay: 1s; animation-duration: 2.8s; }
+        .shooting-star:nth-child(4) { top: 0%; left: -10%; animation-delay: 1.5s; animation-duration: 3.2s; }
+        .shooting-star:nth-child(5) { top: 35%; left: -10%; animation-delay: 2s; animation-duration: 2.7s; }
+        .shooting-star:nth-child(6) { top: 8%; left: -10%; animation-delay: 2.5s; animation-duration: 3.1s; }
+        .shooting-star:nth-child(7) { top: 45%; left: -10%; animation-delay: 3s; animation-duration: 2.9s; }
+        .shooting-star:nth-child(8) { top: 3%; left: -10%; animation-delay: 3.5s; animation-duration: 3.3s; }
+
+        @keyframes shootingStar {
+          0% { opacity: 0; transform: translateX(0) translateY(0) rotate(45deg); }
+          10% { opacity: 1; }
+          90% { opacity: 1; }
+          100% { opacity: 0; transform: translateX(120vw) translateY(50vh) rotate(10deg); }
+        }
+
+        @keyframes shootingStarTail {
+          0% { width: 0; }
+          30% { width: 100px; }
+          100% { width: 0; }
+        }
+
+        .flowers {
+          position: relative;
+          transform: scale(0.7);
+          z-index: 2;
+        }
+
+        .flower {
+          position: absolute;
+          bottom: 15vmin;
+          transform-origin: bottom center;
+          z-index: 50;
+        }
+
+        /* Animaciones de movimiento de flores (sin cambios) */
+        .flower--1 { animation: moving-flower-1 4s linear infinite; }
+        .flower--1 .flower__line { height: 70vmin; animation-delay: 0.3s; }
+        .flower--1 .flower__line__leaf--1 { animation: blooming-leaf-right var(--fl-speed) 1.6s backwards; }
+        .flower--1 .flower__line__leaf--2 { animation: blooming-leaf-right var(--fl-speed) 1.4s backwards; }
+        .flower--1 .flower__line__leaf--3 { animation: blooming-leaf-left var(--fl-speed) 1.2s backwards; }
+        .flower--1 .flower__line__leaf--4 { animation: blooming-leaf-left var(--fl-speed) 1s backwards; }
+
+        .flower--2 { left: 50%; transform: rotate(20deg); animation: moving-flower-2 4s linear infinite; }
+        .flower--2 .flower__line { height: 60vmin; animation-delay: 0.6s; }
+        .flower--2 .flower__line__leaf--1 { animation: blooming-leaf-right var(--fl-speed) 1.9s backwards; }
+        .flower--2 .flower__line__leaf--2 { animation: blooming-leaf-right var(--fl-speed) 1.7s backwards; }
+        .flower--2 .flower__line__leaf--3 { animation: blooming-leaf-left var(--fl-speed) 1.5s backwards; }
+        .flower--2 .flower__line__leaf--4 { animation: blooming-leaf-left var(--fl-speed) 1.3s backwards; }
+
+        .flower--3 { left: 50%; transform: rotate(-15deg); animation: moving-flower-3 4s linear infinite; }
+        .flower--3 .flower__line { animation-delay: 0.9s; }
+        .flower--3 .flower__line__leaf--1 { animation: blooming-leaf-right var(--fl-speed) 2.5s backwards; }
+        .flower--3 .flower__line__leaf--2 { animation: blooming-leaf-right var(--fl-speed) 2.3s backwards; }
+        .flower--3 .flower__line__leaf--3 { animation: blooming-leaf-left var(--fl-speed) 2.1s backwards; }
+        .flower--3 .flower__line__leaf--4 { animation: blooming-leaf-left var(--fl-speed) 1.9s backwards; }
+
+        .flower--4 { left: -25%; z-index: -6; transform: rotate(10deg); animation: moving-flower-4 3.5s linear infinite; }
+        .flower--4 .flower__line { height: 90vmin; animation-delay: 1.2s; }
+        .flower--4 .flower__line__leaf--1 { animation: blooming-leaf-right var(--fl-speed) 2.8s backwards; }
+        .flower--4 .flower__line__leaf--2 { animation: blooming-leaf-right var(--fl-speed) 2.6s backwards; }
+        .flower--4 .flower__line__leaf--3 { animation: blooming-leaf-left var(--fl-speed) 2.4s backwards; }
+        .flower--4 .flower__line__leaf--4 { animation: blooming-leaf-left var(--fl-speed) 2.2s backwards; }
+
+        .flower--5 { left: 75%; z-index: -7; transform: rotate(-25deg); animation: moving-flower-5 4.5s linear infinite; }
+        .flower--5 .flower__line { height: 85vmin; animation-delay: 1.9s; }
+        .flower--5 .flower__line__leaf--1 { animation: blooming-leaf-right var(--fl-speed) 2.7s backwards; }
+        .flower--5 .flower__line__leaf--2 { animation: blooming-leaf-right var(--fl-speed) 2.5s backwards; }
+        .flower--5 .flower__line__leaf--3 { animation: blooming-leaf-left var(--fl-speed) 2.3s backwards; }
+        .flower--5 .flower__line__leaf--4 { animation: blooming-leaf-left var(--fl-speed) 2.1s backwards; }
+
+        .flower__leafs {
+          position: relative;
+          animation: blooming-flower 2s backwards;
+        }
+
+        .flower__leafs::after {
+          content: "";
+          position: absolute;
+          left: 0;
+          top: 0;
+          transform: translate(-50%, -100%);
+          width: 8vmin;
+          height: 8vmin;
+          background-color: #6bf0ff;
+          filter: blur(10vmin);
+        }
+
+        /* --- TULIPANES AZULES --- */
+        .flower__leaf {
+          position: absolute;
+          bottom: 0;
+          left: 50%;
+          width: 9vmin;
+          height: 15vmin;
+          background: radial-gradient(circle at 50% 20%, #e0f7ff 0%, #87ceeb 40%, #1e90ff 100%);
+          border-radius: 50% 50% 40% 40% / 60% 60% 40% 40%;
+          transform-origin: bottom center;
+          opacity: 0.95;
+          z-index: 2;
+          border: 1.5px solid #87ceeb;
+          box-shadow:
+            0 0 1vmin #e0f7ff,
+            0 0 0.5vmin #87ceeb,
+            inset 0 0 1.5vmin rgba(255, 255, 255, 0.6);
+        }
+
+        .flower__leaf--1 { transform: translate(-50%, -5%) rotate(-22deg); z-index: 1; }
+        .flower__leaf--2 { transform: translate(-50%, -5%) rotate(22deg);  z-index: 1; }
+        .flower__leaf--3 { transform: translate(-50%, -10%) rotate(0deg);  z-index: 2; }
+
+        .flower__leaf--4,
+        .flower__leaf--5,
+        .flower__leaf--6 {
+          width: 7vmin;
+          height: 12vmin;
+          background: radial-gradient(circle at 50% 20%, #f0f8ff 0%, #add8e6 50%, #4169e1 100%);
+          opacity: 0.9;
+          border: 1px solid #b0e0e6;
+          border-radius: 50% 50% 45% 45% / 65% 65% 35% 35%;
+          box-shadow:
+            0 0 0.8vmin #e0f7ff,
+            inset 0 0 1vmin rgba(255, 255, 255, 0.5);
+          z-index: 3;
+        }
+
+        .flower__leaf--4 { transform: translate(-50%, -8%) rotate(-10deg); }
+        .flower__leaf--5 { transform: translate(-50%, -8%) rotate(10deg); }
+        .flower__leaf--6 { transform: translate(-50%, -12%) rotate(0deg); }
+
+        .flower__center {
+          position: absolute;
+          left: -2vmin;
+          top: -2vmin;
+          width: 4vmin;
+          height: 4vmin;
+          border-radius: 50%;
+          background:
+            radial-gradient(circle at 30% 30%, #4169e1 0%, #1e90ff 80%, #e0f7ff 100%);
+          border: 2px solid #87ceeb;
+          box-shadow:
+            0 0 1vmin #e0f7ff,
+            0 0 0.5vmin #87ceeb,
+            inset 0 0 1vmin #1e90ff;
+        }
+
+        .flower__line {
+          height: 55vmin;
+          width: 2vmin;
+          background-image: linear-gradient(
+              to left,
+              rgb(0, 0, 0, 0.3),
+              transparent,
+              rgba(255, 255, 255, 0.2)
+            ),
+            linear-gradient(to top, transparent 10%, #2d5016, #4a7c23, #6b8e23);
+          box-shadow: inset 0 0 2px rgba(0, 0, 0, 0.7);
+          animation: grow-flower-tree 4s backwards;
+        }
+
+        .flower__line__leaf {
+          --w: 8vmin;
+          --h: calc(var(--w) + 3vmin);
+          position: absolute;
+          top: 20%;
+          left: 90%;
+          width: var(--w);
+          height: var(--h);
+          border-top-right-radius: var(--h);
+          border-bottom-left-radius: var(--h);
+          background-image: linear-gradient(
+            to top,
+            rgba(45, 80, 22, 0.6),
+            #4a7c23,
+            #6b8e23
+          );
+          box-shadow: inset 0 0 1vmin rgba(0, 0, 0, 0.3);
+        }
+
+        .flower__line__leaf--1 { transform: rotate(70deg) rotateY(30deg); }
+        .flower__line__leaf--2 { top: 45%; transform: rotate(70deg) rotateY(30deg); }
+        .flower__line__leaf--3,
+        .flower__line__leaf--4{
+          border-top-right-radius: 0;
+          border-bottom-left-radius: 0;
+          border-top-left-radius: var(--h);
+          border-bottom-right-radius: var(--h);
+          left: -460%;
+          top: 12%;
+          transform: rotate(-70deg) rotateY(30deg);
+        }
+        .flower__line__leaf--4 { top: 40%; }
+
+        .flower__light {
+          position: absolute;
+          bottom: 0vmin;
+          width: 0.8vmin;
+          height: 0.8vmin;
+          background-color: #87ceeb;
+          border-radius: 50%;
+          filter: blur(0.1vmin);
+          animation: tulip-light 6s linear infinite backwards;
+          box-shadow: 0 0 1vmin rgba(135, 206, 235, 0.8);
+        }
+
+        .flower__light:nth-child(odd) { background-color: #4169e1; }
+
+        /* Posiciones de luces (sin cambios) */
+        .flower__light--1 { left: -2vmin; animation-delay: 1s; }
+        .flower__light--2 { left: 3vmin; animation-delay: 0.5s; }
+        .flower__light--3 { left: -6vmin; animation-delay: 0.3s; }
+        .flower__light--4 { left: 6vmin; animation-delay: 0.9s; }
+        .flower__light--5 { left: -1vmin; animation-delay: 1.5s; }
+        .flower__light--6 { left: -4vmin; animation-delay: 3s; }
+        .flower__light--7 { left: 3vmin; animation-delay: 2s; }
+        .flower__light--8 { left: -6vmin; animation-delay: 3.5s; }
+
+        /* Estilos de hierba (mantenidos, pero omitidos aquí por brevedad) */
+
+        .special-text {
+            position: fixed;
+            top: 5%;
+            left: 50%;
+            transform: translateX(-50%);
+            color: #e0f7ff;
+            font-family: 'Dancing Script', cursive; /* ¡Fuente bonita y romántica! */
+            font-size: 4.2vmin;
+            font-weight: bold;
+            text-align: center;
+            padding: 2.5vmin 4vmin;
+            line-height: 1.6;
+            text-shadow: 0 0 2vmin rgba(135, 206, 235, 0.8);
+            background: rgba(0, 50, 100, 0.25);
+            border-radius: 2vmin;
+            backdrop-filter: blur(1vmin);
+            z-index: 10;
+            opacity: 0;
+            animation: fadeIn 3s 1s forwards;
+            max-width: 85%;
+        }
+
+        @keyframes fadeIn {
+            to { opacity: 1; }
+        }
+
+        @keyframes tulip-light {
+          0% { opacity: 0; transform: translateY(0vmin) rotate(0deg); }
+          20% { opacity: 1; transform: translateY(-3vmin) translateX(-1vmin) rotate(45deg); }
+          40% { opacity: 1; transform: translateY(-8vmin) translateX(1vmin) rotate(90deg); }
+          60% { transform: translateY(-12vmin) translateX(-1vmin) rotate(135deg); }
+          80% { transform: translateY(-16vmin) translateX(2vmin) rotate(180deg); opacity: 0.5; }
+          100% { transform: translateY(-25vmin) rotate(225deg); opacity: 0; }
+        }
+
+        /* Keyframes de movimiento de flores y hierba (mantenidos) */
+        @keyframes moving-flower-1 { 0%, 100% { transform: rotate(2deg); } 50% { transform: rotate(-2deg); } }
+        @keyframes moving-flower-2 { 0%, 100% { transform: rotate(18deg); } 50% { transform: rotate(14deg); } }
+        @keyframes moving-flower-3 { 0%, 100% { transform: rotate(-18deg); } 50% { transform: rotate(-20deg) rotateY(-10deg); } }
+        @keyframes moving-flower-4 { 0%, 100% { transform: rotate(9deg); } 50% { transform: rotate(12deg) rotateY(9deg); } }
+        @keyframes moving-flower-5 { 0%, 100% { transform: rotate(-5deg); } 50% { transform: rotate(-11deg) rotateY(5deg); } }
+
+        @keyframes blooming-leaf-right { 0% { transform-origin: left; transform: rotate(70deg) rotateY(30deg) scale(0); } }
+        @keyframes blooming-leaf-left { 0% { transform-origin: right; transform: rotate(-70deg) rotateY(30deg) scale(0); } }
+        @keyframes grow-flower-tree { 0% { height: 0; border-radius: 1vmin; } }
+        @keyframes blooming-flower { 0% { transform: scale(0); } }
+
+        /* Movimiento de hierba (se mantienen, omitidos por brevedad) */
+    </style>
+</head>
+<body class="not-loaded">
+  <div class="night"></div>
+  
+  <div class="special-text">
+    Unas flores azules para la mejor novia del mundo.<br> 
+    Cuando podamos vernos en persona te regalaré flores entre otras cositas como corresponde.<br>
+    <strong>Te quiero mucho, amor.</strong>
+  </div>
+
+  <div class="shooting-stars">
+    <!-- Estrellas iniciales (8) -->
+    <div class="shooting-star"></div>
+    <div class="shooting-star"></div>
+    <div class="shooting-star"></div>
+    <div class="shooting-star"></div>
+    <div class="shooting-star"></div>
+    <div class="shooting-star"></div>
+    <div class="shooting-star"></div>
+    <div class="shooting-star"></div>
+  </div>
+  
+  <div class="flowers">
+    <!-- Tulipán 1 (original) -->
+    <div class="flower flower--1">
+      <div class="flower__leafs flower__leafs--1">
+        <div class="flower__leaf flower__leaf--1"></div>
+        <div class="flower__leaf flower__leaf--2"></div>
+        <div class="flower__leaf flower__leaf--3"></div>
+        <div class="flower__leaf flower__leaf--4"></div>
+        <div class="flower__leaf flower__leaf--5"></div>
+        <div class="flower__leaf flower__leaf--6"></div>
+        <div class="flower__center"></div>
+        <div class="flower__light flower__light--1"></div>
+        <div class="flower__light flower__light--2"></div>
+        <div class="flower__light flower__light--3"></div>
+        <div class="flower__light flower__light--4"></div>
+        <div class="flower__light flower__light--5"></div>
+        <div class="flower__light flower__light--6"></div>
+        <div class="flower__light flower__light--7"></div>
+        <div class="flower__light flower__light--8"></div>
+      </div>
+      <div class="flower__line">
+        <div class="flower__line__leaf flower__line__leaf--1"></div>
+        <div class="flower__line__leaf flower__line__leaf--2"></div>
+        <div class="flower__line__leaf flower__line__leaf--3"></div>
+        <div class="flower__line__leaf flower__line__leaf--4"></div>
+      </div>
+    </div>
+
+    <!-- Tulipán 2 (original) -->
+    <div class="flower flower--2">
+      <div class="flower__leafs flower__leafs--2">
+        <div class="flower__leaf flower__leaf--1"></div>
+        <div class="flower__leaf flower__leaf--2"></div>
+        <div class="flower__leaf flower__leaf--3"></div>
+        <div class="flower__leaf flower__leaf--4"></div>
+        <div class="flower__leaf flower__leaf--5"></div>
+        <div class="flower__leaf flower__leaf--6"></div>
+        <div class="flower__center"></div>
+        <div class="flower__light flower__light--1"></div>
+        <div class="flower__light flower__light--2"></div>
+        <div class="flower__light flower__light--3"></div>
+        <div class="flower__light flower__light--4"></div>
+        <div class="flower__light flower__light--5"></div>
+        <div class="flower__light flower__light--6"></div>
+        <div class="flower__light flower__light--7"></div>
+        <div class="flower__light flower__light--8"></div>
+      </div>
+      <div class="flower__line">
+        <div class="flower__line__leaf flower__line__leaf--1"></div>
+        <div class="flower__line__leaf flower__line__leaf--2"></div>
+        <div class="flower__line__leaf flower__line__leaf--3"></div>
+        <div class="flower__line__leaf flower__line__leaf--4"></div>
+      </div>
+    </div>
+
+    <!-- Tulipán 3 (original) -->
+    <div class="flower flower--3">
+      <div class="flower__leafs flower__leafs--3">
+        <div class="flower__leaf flower__leaf--1"></div>
+        <div class="flower__leaf flower__leaf--2"></div>
+        <div class="flower__leaf flower__leaf--3"></div>
+        <div class="flower__leaf flower__leaf--4"></div>
+        <div class="flower__leaf flower__leaf--5"></div>
+        <div class="flower__leaf flower__leaf--6"></div>
+        <div class="flower__center"></div>
+        <div class="flower__light flower__light--1"></div>
+        <div class="flower__light flower__light--2"></div>
+        <div class="flower__light flower__light--3"></div>
+        <div class="flower__light flower__light--4"></div>
+        <div class="flower__light flower__light--5"></div>
+        <div class="flower__light flower__light--6"></div>
+        <div class="flower__light flower__light--7"></div>
+        <div class="flower__light flower__light--8"></div>
+      </div>
+      <div class="flower__line">
+        <div class="flower__line__leaf flower__line__leaf--1"></div>
+        <div class="flower__line__leaf flower__line__leaf--2"></div>
+        <div class="flower__line__leaf flower__line__leaf--3"></div>
+        <div class="flower__line__leaf flower__line__leaf--4"></div>
+      </div>
+    </div>
+
+    <!-- Tulipán 4 (original) -->
+    <div class="flower flower--4">
+      <div class="flower__leafs flower__leafs--4">
+        <div class="flower__leaf flower__leaf--1"></div>
+        <div class="flower__leaf flower__leaf--2"></div>
+        <div class="flower__leaf flower__leaf--3"></div>
+        <div class="flower__leaf flower__leaf--4"></div>
+        <div class="flower__leaf flower__leaf--5"></div>
+        <div class="flower__leaf flower__leaf--6"></div>
+        <div class="flower__center"></div>
+        <div class="flower__light flower__light--1"></div>
+        <div class="flower__light flower__light--2"></div>
+        <div class="flower__light flower__light--3"></div>
+        <div class="flower__light flower__light--4"></div>
+        <div class="flower__light flower__light--5"></div>
+        <div class="flower__light flower__light--6"></div>
+        <div class="flower__light flower__light--7"></div>
+        <div class="flower__light flower__light--8"></div>
+      </div>
+      <div class="flower__line">
+        <div class="flower__line__leaf flower__line__leaf--1"></div>
+        <div class="flower__line__leaf flower__line__leaf--2"></div>
+        <div class="flower__line__leaf flower__line__leaf--3"></div>
+        <div class="flower__line__leaf flower__line__leaf--4"></div>
+      </div>
+    </div>
+
+    <!-- Tulipán 5 (original) -->
+    <div class="flower flower--5">
+      <div class="flower__leafs flower__leafs--5">
+        <div class="flower__leaf flower__leaf--1"></div>
+        <div class="flower__leaf flower__leaf--2"></div>
+        <div class="flower__leaf flower__leaf--3"></div>
+        <div class="flower__leaf flower__leaf--4"></div>
+        <div class="flower__leaf flower__leaf--5"></div>
+        <div class="flower__leaf flower__leaf--6"></div>
+        <div class="flower__center"></div>
+        <div class="flower__light flower__light--1"></div>
+        <div class="flower__light flower__light--2"></div>
+        <div class="flower__light flower__light--3"></div>
+        <div class="flower__light flower__light--4"></div>
+        <div class="flower__light flower__light--5"></div>
+        <div class="flower__light flower__light--6"></div>
+        <div class="flower__light flower__light--7"></div>
+        <div class="flower__light flower__light--8"></div>
+      </div>
+      <div class="flower__line">
+        <div class="flower__line__leaf flower__line__leaf--1"></div>
+        <div class="flower__line__leaf flower__line__leaf--2"></div>
+        <div class="flower__line__leaf flower__line__leaf--3"></div>
+        <div class="flower__line__leaf flower__line__leaf--4"></div>
+      </div>
+    </div>
+
+    <!-- 🌸 TULIPÁN 6 -->
+    <div class="flower" style="left:15%; transform:rotate(-10deg); z-index:40; animation: moving-flower-1 3.8s linear infinite;">
+      <div class="flower__leafs">
+        <div class="flower__leaf flower__leaf--1"></div>
+        <div class="flower__leaf flower__leaf--2"></div>
+        <div class="flower__leaf flower__leaf--3"></div>
+        <div class="flower__leaf flower__leaf--4"></div>
+        <div class="flower__leaf flower__leaf--5"></div>
+        <div class="flower__leaf flower__leaf--6"></div>
+        <div class="flower__center"></div>
+      </div>
+      <div class="flower__line"></div>
+    </div>
+
+    <!-- 🌸 TULIPÁN 7 -->
+    <div class="flower" style="left:85%; transform:rotate(12deg); z-index:40; animation: moving-flower-2 4.2s linear infinite;">
+      <div class="flower__leafs">
+        <div class="flower__leaf flower__leaf--1"></div>
+        <div class="flower__leaf flower__leaf--2"></div>
+        <div class="flower__leaf flower__leaf--3"></div>
+        <div class="flower__leaf flower__leaf--4"></div>
+        <div class="flower__leaf flower__leaf--5"></div>
+        <div class="flower__leaf flower__leaf--6"></div>
+        <div class="flower__center"></div>
+      </div>
+      <div class="flower__line"></div>
+    </div>
+
+    <!-- 🌸 TULIPÁN 8 -->
+    <div class="flower" style="left:30%; transform:rotate(5deg); z-index:35; animation: moving-flower-3 4.0s linear infinite;">
+      <div class="flower__leafs">
+        <div class="flower__leaf flower__leaf--1"></div>
+        <div class="flower__leaf flower__leaf--2"></div>
+        <div class="flower__leaf flower__leaf--3"></div>
+        <div class="flower__leaf flower__leaf--4"></div>
+        <div class="flower__leaf flower__leaf--5"></div>
+        <div class="flower__leaf flower__leaf--6"></div>
+        <div class="flower__center"></div>
+      </div>
+      <div class="flower__line"></div>
+    </div>
+
+    <!-- 🌸 TULIPÁN 9 -->
+    <div class="flower" style="left:70%; transform:rotate(-8deg); z-index:35; animation: moving-flower-4 3.9s linear infinite;">
+      <div class="flower__leafs">
+        <div class="flower__leaf flower__leaf--1"></div>
+        <div class="flower__leaf flower__leaf--2"></div>
+        <div class="flower__leaf flower__leaf--3"></div>
+        <div class="flower__leaf flower__leaf--4"></div>
+        <div class="flower__leaf flower__leaf--5"></div>
+        <div class="flower__leaf flower__leaf--6"></div>
+        <div class="flower__center"></div>
+      </div>
+      <div class="flower__line"></div>
+    </div>
+
+    <!-- 🌸 TULIPÁN 10 -->
+    <div class="flower" style="left:45%; transform:rotate(18deg); z-index:30; animation: moving-flower-5 4.3s linear infinite;">
+      <div class="flower__leafs">
+        <div class="flower__leaf flower__leaf--1"></div>
+        <div class="flower__leaf flower__leaf--2"></div>
+        <div class="flower__leaf flower__leaf--3"></div>
+        <div class="flower__leaf flower__leaf--4"></div>
+        <div class="flower__leaf flower__leaf--5"></div>
+        <div class="flower__leaf flower__leaf--6"></div>
+        <div class="flower__center"></div>
+      </div>
+      <div class="flower__line"></div>
+    </div>
+
+    <!-- 🌸 TULIPÁN 11 -->
+    <div class="flower" style="left:55%; transform:rotate(-22deg); z-index:30; animation: moving-flower-1 4.1s linear infinite;">
+      <div class="flower__leafs">
+        <div class="flower__leaf flower__leaf--1"></div>
+        <div class="flower__leaf flower__leaf--2"></div>
+        <div class="flower__leaf flower__leaf--3"></div>
+        <div class="flower__leaf flower__leaf--4"></div>
+        <div class="flower__leaf flower__leaf--5"></div>
+        <div class="flower__leaf flower__leaf--6"></div>
+        <div class="flower__center"></div>
+      </div>
+      <div class="flower__line"></div>
+    </div>
+
+    <!-- 🌸 TULIPÁN 12 -->
+    <div class="flower" style="left:10%; transform:rotate(8deg); z-index:25; animation: moving-flower-3 3.7s linear infinite;">
+      <div class="flower__leafs">
+        <div class="flower__leaf flower__leaf--1"></div>
+        <div class="flower__leaf flower__leaf--2"></div>
+        <div class="flower__leaf flower__leaf--3"></div>
+        <div class="flower__leaf flower__leaf--4"></div>
+        <div class="flower__leaf flower__leaf--5"></div>
+        <div class="flower__leaf flower__leaf--6"></div>
+        <div class="flower__center"></div>
+      </div>
+      <div class="flower__line"></div>
+    </div>
+
+    <!-- 🌸 TULIPÁN 13 -->
+    <div class="flower" style="left:90%; transform:rotate(-15deg); z-index:25; animation: moving-flower-2 4.4s linear infinite;">
+      <div class="flower__leafs">
+        <div class="flower__leaf flower__leaf--1"></div>
+        <div class="flower__leaf flower__leaf--2"></div>
+        <div class="flower__leaf flower__leaf--3"></div>
+        <div class="flower__leaf flower__leaf--4"></div>
+        <div class="flower__leaf flower__leaf--5"></div>
+        <div class="flower__leaf flower__leaf--6"></div>
+        <div class="flower__center"></div>
+      </div>
+      <div class="flower__line"></div>
+    </div>
+
+    <!-- 🌸 TULIPÁN 14 -->
+    <div class="flower" style="left:38%; transform:rotate(25deg); z-index:20; animation: moving-flower-4 3.6s linear infinite;">
+      <div class="flower__leafs">
+        <div class="flower__leaf flower__leaf--1"></div>
+        <div class="flower__leaf flower__leaf--2"></div>
+        <div class="flower__leaf flower__leaf--3"></div>
+        <div class="flower__leaf flower__leaf--4"></div>
+        <div class="flower__leaf flower__leaf--5"></div>
+        <div class="flower__leaf flower__leaf--6"></div>
+        <div class="flower__center"></div>
+      </div>
+      <div class="flower__line"></div>
+    </div>
+  </div>
+
+  <script>
+    // Iniciar animaciones
+    document.body.classList.remove('not-loaded');
+
+    // Generar MUCHAS más estrellas fugaces
+    function createShootingStar() {
+      const star = document.createElement('div');
+      star.className = 'shooting-star';
+      star.style.top = Math.random() * 60 + '%';
+      star.style.left = '-10%';
+      star.style.animationDelay = '0s';
+      star.style.animationDuration = (Math.random() * 1 + 2) + 's'; // Más rápidas
+      document.querySelector('.shooting-stars').appendChild(star);
+      
+      // Eliminar estrella del DOM después de la animación
+      setTimeout(() => {
+        if (star.parentNode) {
+          star.parentNode.removeChild(star);
+        }
+      }, 4000);
+    }
+
+    // Aumentamos la frecuencia y la probabilidad
+    setInterval(() => {
+      // 70% de probabilidad de crear una estrella en cada intervalo
+      if (Math.random() > 0.3) {
+        createShootingStar();
+      }
+    }, 800); // Cada 0.8 segundos (¡mucho más frecuente!)
+
+    // Añadimos 5 estrellas extra al inicio para impacto visual
+    setTimeout(() => {
+      for (let i = 0; i < 5; i++) {
+        createShootingStar();
+      }
+    }, 1000);
+  </script>
+</body>
+</html>
